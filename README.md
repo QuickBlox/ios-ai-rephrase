@@ -5,7 +5,8 @@
 </p>
 
 </div>
-# QBAIRephrase
+
+##  QBAIRephrase
 
 QBAIRephrase is a Swift package that provides text rephrasing and tone management functionalities, including integration with the OpenAI API.
 
