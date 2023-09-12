@@ -110,7 +110,7 @@ public func insert(tone: ToneInfo, at index: Int) {
 /// Appends a specific tone to the list of available tones.
 ///
 /// - Parameter tone: The tone to append.
-func append<T: Tone>(_ tone: T) {
+public func append<T: Tone>(_ tone: T) {
     guard var newTones = tones as? [T] else {
         return
     }
@@ -129,7 +129,7 @@ func append<T: Tone>(_ tone: T) {
 /// Appends a specific tone (`ToneInfo`) to the list of available tones.
 ///
 /// - Parameter tone: The tone to append.
-func append(tone: ToneInfo) {
+public func append(tone: ToneInfo) {
     append(tone)
 }
 
