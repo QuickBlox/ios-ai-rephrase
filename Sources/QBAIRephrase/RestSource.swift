@@ -74,25 +74,25 @@ public enum RestSourceException: Error {
 
 /// Represents the protocol for making RESTful API calls to OpenAI.
 public protocol RestSourceProtocol {
-    func requestOpenAI<T: Tone>(rephrase text: String,
-                                tone: T,
-                                key: String,
-                                apply settings: OpenAISettings) async throws -> String
+    func requestOpenAI(rephrase text: String,
+                       tone: String,
+                       key: String,
+                       apply settings: OpenAISettings) async throws -> String
     
-    func requestOpenAI<T: Tone>(rephrase text: String,
-                                tone: T,
-                                token: String,
-                                proxy urlPath: String,
-                                apply settings: OpenAISettings) async throws -> String
+    func requestOpenAI(rephrase text: String,
+                       tone: String,
+                       token: String,
+                       proxy urlPath: String,
+                       apply settings: OpenAISettings) async throws -> String
     
 }
 
 /// Represents the default implementation of RestSourceProtocol using URLSession to make API requests to OpenAI.
 open class RestSource: RestSourceProtocol {
-    public func requestOpenAI<T>(rephrase text: String,
-                                 tone: T,
-                                 key: String,
-                                 apply settings: OpenAISettings) async throws -> String where T : Tone {
+    public func requestOpenAI(rephrase text: String,
+                              tone: String,
+                              key: String,
+                              apply settings: OpenAISettings) async throws -> String {
         let body = try httpBody(with: text,
                                 using: tone,
                                 settings: settings.body)
@@ -104,10 +104,11 @@ open class RestSource: RestSourceProtocol {
         return try await responseAnswer(with: request)
     }
     
-    public func requestOpenAI<T>(rephrase text: String,
-                                 tone: T, token: String,
-                                 proxy urlPath: String,
-                                 apply settings: OpenAISettings) async throws -> String where T : Tone {
+    public func requestOpenAI(rephrase text: String,
+                              tone: String,
+                              token: String,
+                              proxy urlPath: String,
+                              apply settings: OpenAISettings) async throws -> String {
         let body = try httpBody(with: text,
                                 using: tone,
                                 settings: settings.body)
@@ -196,42 +197,42 @@ open class RestSource: RestSourceProtocol {
         return try parseAnswer(from: data)
     }
     
-    private func httpBody<T: Tone>(with text: String,
-                                   using tone: T,
-                                   settings: OpenAIBodySettings) throws -> Data {
+    private func httpBody(with text: String,
+                          using tone: String,
+                          settings: OpenAIBodySettings) throws -> Data {
         var httpBody: [String: Any] = [
             "model": settings.model.rawValue,
             "temperature": settings.temperature
         ]
-
+        
         if let maxToken = settings.maxTokens, maxToken > 0 {
             httpBody["max_tokens"] = maxToken
         }
-
+        
         httpBody["messages"] = messagesJson(from: tone, message: text)
-
+        
         return try JSONSerialization.data(withJSONObject: httpBody)
     }
     
-    private func messagesJson<T: Tone>(from tone: T, message text: String) -> [[String: String]] {
+    private func messagesJson(from tone: String, message text: String) -> [[String: String]] {
         var json: [[String: String]] = []
         json.append(systemJson(from: tone))
         json.append(userJson(from: text))
-
+        
         return json
     }
     
-    private func systemJson<T: Tone>(from tone: T) -> [String: String] {
+    private func systemJson(from tone: String) -> [String: String] {
         return [
             "role": "system",
             "content":
                 "Use the following step-by-step instructions to respond to user inputs." +
-                "\n Step 1 - The user will provide you with text in triple quotes. " +
-                "\n Paraphrase this text in a \(tone)" +
-                "\n Step 2 - Provide the result without the tone prefix"
+            "\n Step 1 - The user will provide you with text in triple quotes. " +
+            "\n Paraphrase this text in a \(tone)" +
+            "\n Step 2 - Provide the result without the tone prefix"
         ]
     }
-
+    
     private func userJson(from text: String) -> [String: String] {
         return [
             "role": "user",

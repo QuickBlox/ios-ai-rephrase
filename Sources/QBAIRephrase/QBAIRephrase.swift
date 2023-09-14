@@ -187,22 +187,10 @@ public func openAI<T: Tone>(rephrase text: String,
         throw QBAIException.incorrectToken
     }
     
-    let tokenizer = Tokenizer()
-    
-    var count: Int
-    switch settings.toneContent {
-    case .name:
-        count = tokenizer.parseTokensCount(from: text + " " + tone.name)
-    case .summary:
-        count = tokenizer.parseTokensCount(from: text + " " + tone.summary)
-    }
-    
-    if count > settings.maxTokenCount {
-        throw QBAIException.incorrectTokensCount
-    }
+    try checkTokenCount(text: text, tone: tone)
     
     return try await dependency.restSource.requestOpenAI(rephrase: text,
-                                                         tone: tone,
+                                                         tone: toneBehavior(tone),
                                                          key: apiKey,
                                                          apply: settings.openAI)
 }
@@ -271,22 +259,10 @@ public func openAI<T: Tone>(rephrase text: String,
         throw QBAIException.incorrectProxyServerUrl
     }
     
-    let tokenizer = Tokenizer()
-    
-    var count: Int
-    switch settings.toneContent {
-    case .name:
-        count = tokenizer.parseTokensCount(from: text + " " + tone.name)
-    case .summary:
-        count = tokenizer.parseTokensCount(from: text + " " + tone.summary)
-    }
-    
-    if count > settings.maxTokenCount {
-        throw QBAIException.incorrectTokensCount
-    }
+    try checkTokenCount(text: text, tone: tone)
     
     return try await dependency.restSource.requestOpenAI(rephrase: text,
-                                                         tone: tone,
+                                                         tone: toneBehavior(tone),
                                                          token: qbToken,
                                                          proxy: urlPath,
                                                          apply: settings.openAI)
@@ -334,6 +310,29 @@ public func openAI(rephrase text: String,
                             using: tone,
                             qbToken: qbToken,
                             proxy: urlPath)
+}
+
+private func checkTokenCount<T>(text: String, tone: T) throws where T: Tone {
+    let tokenizer = Tokenizer()
+    var count: Int
+    
+    switch settings.toneContent {
+    case .name:
+        count = tokenizer.parseTokensCount(from: text + " " + tone.name)
+    case .summary:
+        count = tokenizer.parseTokensCount(from: text + " " + tone.summary)
+    }
+    
+    if count > settings.maxTokenCount {
+        throw QBAIException.incorrectTokensCount
+    }
+}
+
+private func toneBehavior<T>(_ tone: T) -> String where T: Tone {
+    switch settings.toneContent {
+    case .name: return tone.name
+    case .summary: return tone.summary
+    }
 }
 
 /// Extension to provide a utility method to check if a string is not correct by removing whitespaces and newlines from both ends and checking if the resulting string is empty.
