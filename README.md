@@ -32,7 +32,7 @@ import QBAIRephrase
 2. Rephrase text using the OpenAI API:
 
 ```swift
-let text: String = ... // Replace with your text
+let text: String = ... // Replace this with the text you want to rephrase
 
 let friendly = AITone(
     name: "Friendly",
@@ -40,7 +40,7 @@ let friendly = AITone(
         icon: "🤝"
 )
 
-// Otional you can add the history of messages as a content to helps rephrasing 
+// Optionally, you can provide a history of previous messages to aid in rephrasing. 
 let message1 = AIMessage(role: .me, text: "Hi there, how can I help you today?")
 let message2 = AIMessage(role: .other, text: "I need help with the iOS Swift Package. How do I set it up? ")
 let messages = [message1, message2]
