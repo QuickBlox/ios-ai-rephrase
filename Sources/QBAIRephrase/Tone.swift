@@ -14,7 +14,7 @@ public protocol Tone: Codable, Equatable, Hashable {
 }
 
 public extension Tone {
-    static func == (lhs: any Tone, rhs: any Tone) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
       return lhs.name == rhs.name
     }
 }
